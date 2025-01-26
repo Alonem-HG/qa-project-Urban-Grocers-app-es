@@ -50,37 +50,21 @@ def get_new_user_token(user_body):
 
 
 def post_new_client_kit(kit_body):
-    # Realiza una solicitud POST para crear un nuevo cliente con su respectivo kit.
+    # Realiza una solicitud POST para crear un nuevo user.
     create_user = post_new_user(data.user_body)
+    # Obtener el token del user
     auth_token = create_user.json()['authToken']
+    # Agregar auth_token a headers
+    headers = data.headers.copy()
+    headers["Authorization"] = f"Bearer {auth_token}"
 
+    # Crear un kit con el user de arriba
     return requests.post(
         configuration.URL_SERVICE + configuration.KITS_PATH,  # Concatenación de URL base y ruta.
         json=kit_body,  # Datos a enviar en la solicitud.
-        headers={
-            "Content-Type": "application/json", # Tipo de contenido para la solicitud.
-            "Authorization": f"{auth_token}"  # Encabezado de autenticación con el token.
-        }
+        headers=headers
     )
 
 
-# check url
 def get_kits_table():
     return requests.get(configuration.URL_SERVICE + configuration.KITS_TABLE_PATH)
-
-"""
-# Obtén el token de autenticación del nuevo usuario
-auth_token = get_new_user_token(data.user_body)
-
-# Datos para el nuevo kit
-kit_body = get_kit_body(name="Kit Avanzado")
-
-# Realizar la solicitud para crear un nuevo kit
-response = post_new_client_kit(kit_body=kit_body, auth_token=auth_token)
-
-# Validar la respuesta
-if response.status_code == 201:
-    print("Kit creado con éxito:", response.json())
-else:
-    print("Error al crear el kit:", response.status_code, response.text)
-"""
